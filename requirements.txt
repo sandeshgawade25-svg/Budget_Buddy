@@ -10,3 +10,4 @@ email-validator
 reportlab
 pandas
 numpy
+
