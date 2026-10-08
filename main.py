@@ -51,13 +51,24 @@ import numpy as np
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me-in-production-please-32chars")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MIN = 60 * 24 * 7
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./budgetbuddy.db")
+# Read Turso environment variables
+TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
+TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
 
-
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
-)
+if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
+    # Production: Connect to Turso
+    DATABASE_URL = f"sqlite+{TURSO_DATABASE_URL}?secure=true"
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"auth_token": TURSO_AUTH_TOKEN}
+    )
+else:
+    # Local fallback: Use a local SQLite file
+    DATABASE_URL = "sqlite:///./budgetbuddy.db"
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
