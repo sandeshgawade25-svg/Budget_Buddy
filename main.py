@@ -52,16 +52,17 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me-in-production-please-
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MIN = 60 * 24 * 7
 # Read Turso environment variables
+# Read Turso environment variables
 TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
 
 if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
-    # Production: Connect to Turso
-    DATABASE_URL = f"sqlite+{TURSO_DATABASE_URL}?secure=true"
-    engine = create_engine(
-        DATABASE_URL,
-        connect_args={"auth_token": TURSO_AUTH_TOKEN}
-    )
+    # Production: Connect to Turso (libSQL)
+    # Strip any existing protocol prefix to avoid double-prefixing
+    host = TURSO_DATABASE_URL.replace("libsql://", "").replace("https://", "").replace("http://", "")
+    DATABASE_URL = f"sqlite+libsql://{host}?authToken={TURSO_AUTH_TOKEN}&secure=true"
+    engine = create_engine(DATABASE_URL)
+    print(f"✅ Using Turso database: {host}")
 else:
     # Local fallback: Use a local SQLite file
     DATABASE_URL = "sqlite:///./budgetbuddy.db"
@@ -69,6 +70,7 @@ else:
         DATABASE_URL,
         connect_args={"check_same_thread": False}
     )
+    print("⚠️  Using local SQLite (Turso not configured)")
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
