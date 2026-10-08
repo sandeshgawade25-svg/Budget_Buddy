@@ -57,10 +57,13 @@ TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
 
 if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
     # Production: Connect to Turso (libSQL)
-    # Strip any existing protocol prefix to avoid double-prefixing
-    host = TURSO_DATABASE_URL.replace("libsql://", "").replace("https://", "").replace("http://", "")
-    DATABASE_URL = f"sqlite+libsql://{host}?authToken={TURSO_AUTH_TOKEN}&secure=true"
-    engine = create_engine(DATABASE_URL)
+    # Strip protocol prefix to avoid double-prefixing
+    host = TURSO_DATABASE_URL.replace("libsql://", "").replace("https://", "").replace("http://", "").rstrip("/")
+    DATABASE_URL = f"sqlite+libsql://{host}?secure=true"
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"auth_token": TURSO_AUTH_TOKEN}
+    )
     print(f"✅ Using Turso database: {host}")
 else:
     # Local fallback: Use a local SQLite file
