@@ -10,5 +10,5 @@ email-validator
 reportlab
 pandas
 numpy
-pg8000
+psycopg2-binary
 python-dotenv
