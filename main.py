@@ -2,7 +2,6 @@
 BudgetBuddy - Single file full-stack expense tracker
 Accounts + EMI + Income + Themes + PDF Reports + Indian Rupees
 Uses PyJWT + ReportLab
-
 Run: python main.py  ->  http://localhost:8000
 """
 import os
