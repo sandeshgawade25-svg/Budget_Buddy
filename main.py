@@ -52,9 +52,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me-in-production-please-
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MIN = 60 * 24 * 7
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./budgetbuddy.db")
-# pg8000 driver use karo (pure Python, koi compilation nahi)
-if DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1)
+
 
 engine = create_engine(
     DATABASE_URL,
